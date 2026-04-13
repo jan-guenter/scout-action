@@ -38729,7 +38729,7 @@ const __dirname$1 = path$1.dirname(__filename$1);
 
 
 function getOctokit() {
-    if (context.apiUrl && context.apiUrl !== 'https://api.github.com') {
+    if (context.apiUrl && !context.apiUrl.includes('api.github.com')) {
         return new Octokit({
             auth: getInput('github-com-token', { required: true }),
         })
@@ -38809,7 +38809,7 @@ function getBinaryName() {
 }
 
 async function main() {
-    const version = "1.20.4";
+    const version = "v1.20.4";
 
     const binaryName = getBinaryName();
     const binaryPath = path$1.join(__dirname$1, "dist");

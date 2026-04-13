@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename)
 
 
 function getOctokit() {
-    if (github.context.apiUrl && github.context.apiUrl !== 'https://api.github.com') {
+    if (github.context.apiUrl && !github.context.apiUrl.includes('api.github.com')) {
         return new Octokit({
             auth: core.getInput('github-com-token', { required: true }),
         })
