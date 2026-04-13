@@ -1,5 +1,6 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
+const {Octokit} = require('octokit')
 const tc = require('@actions/tool-cache')
 
 const childProcess = require('child_process')
@@ -13,6 +14,16 @@ const { fileURLToPath } = require('url');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
+function getOctokit() {
+    if (github.context.apiUrl && github.context.apiUrl !== 'https://api.github.com') {
+        return new Octokit({
+            auth: core.getInput('github-com-token', { required: true }),
+        })
+    }
+    return github.getOctokit(core.getInput('github-token'))
+}
+
 /**
  * Downloads the specified release of the Docker Scout Action binary from GitHub and saves it to the specified path.
  *
@@ -22,7 +33,7 @@ const __dirname = path.dirname(__filename);
  * @returns {Promise<void>}
  */
 async function downloadRelease(version, binaryPath, binaryName) {
-    const octokit = github.getOctokit(core.getInput('github-token'))
+    const octokit = getOctokit()
 
     let release;
     try {

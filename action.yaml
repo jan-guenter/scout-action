@@ -181,6 +181,11 @@ inputs:
     description: If set, keep but hide previous comment. If not set, keep and update one single comment per job
     required: false
 
+  # github.com credentials
+  github-com-token:
+    description: GitHub.com Token to access GitHub.com API to find scoout release (only necessary for use on GHES or ghe.com)
+    required: false
+
 runs:
   using: node24
   main: index.js
