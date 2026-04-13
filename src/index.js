@@ -1,18 +1,18 @@
-const core = require('@actions/core')
-const github = require('@actions/github')
-const {Octokit} = require('octokit')
-const tc = require('@actions/tool-cache')
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import * as tc from '@actions/tool-cache'
+import { Octokit } from 'octokit'
 
-const childProcess = require('child_process')
-const fs = require('fs')
-const os = require('os')
-const path = require('path')
-const process = require('process')
+import childProcess from 'node:child_process'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import process from 'node:process'
 
-const { fileURLToPath } = require('url');
+import { fileURLToPath } from 'node:url'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 
 function getOctokit() {
