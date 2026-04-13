@@ -8,19 +8,47 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const process = require('process')
+const { fetch: undiciFetch, ProxyAgent } = require('undici')
+
 
 const { fileURLToPath } = require('url');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-function getOctokit() {
+/**
+ * Returns an authenticated github.com Octokit instance.
+ * If the action is running in a GitHub Enterprise environment, it uses
+ * the provided `github-com-token` input for authentication and configures
+ * the Octokit instance to use the appropriate API URL and proxy settings.
+ * Otherwise, it uses the default GitHub token for authentication.
+ * 
+ * @returns {Octokit} An authenticated Octokit instance for github.com
+ */
+function getCloudOctokit() {
     if (github.context.apiUrl && github.context.apiUrl !== 'https://api.github.com') {
-        return new Octokit({
-            auth: core.getInput('github-com-token', { required: true }),
-        })
+        const options = {}
+
+        const auth = core.getInput('github-com-token')
+        if (auth) {
+            options.auth = auth
+        }
+
+        const proxy = process.env.HTTPS_PROXY;
+        if (proxy !== undefined) {
+            options.request = {
+                fetch: async (url, opts) => {
+                    return undiciFetch(url, {
+                    ...opts,
+                    dispatcher: new ProxyAgent(proxy),
+                    })
+                }
+            }
+        }
+
+        return new Octokit(options)
     }
+
     return github.getOctokit(core.getInput('github-token'))
 }
 
@@ -33,7 +61,7 @@ function getOctokit() {
  * @returns {Promise<void>}
  */
 async function downloadRelease(version, binaryPath, binaryName) {
-    const octokit = getOctokit()
+    const octokit = getCloudOctokit()
 
     let release;
     try {
